@@ -1,21 +1,10 @@
 ---
 - hosts: 127.0.0.1
   connection: local
-  vars:
-    - local_user: "han"
-    - github_user: "patrick-motard"
-    - new_install: true
-    - background_images_dir: "/home/{{local_user}}/Dropbox/photos/backgrounds/2017/selected"
-    - dot_ansible_path: "/home/{{local_user}}/code/dot-ansible"
-    # - desktop_background_schedule: "*/1 * * * *"
-    # install packages from pacman_pkgs
-    - optional_pacman_packages: true
-    # install packages from aur_pkgs
-    - optional_aur_packages: true
+  # vars: ** see group_vars **
   roles:
     - pacman
-    - desktop-background
-
+    # - desktop-background
   tasks:
 
     # - name: ckb (corsair keyboard)
@@ -84,24 +73,24 @@
       register: yadm_repo
     - name: Set yadm remote to .ssh
       become: false
-      shell: "yadm remote set-url origin git@github.com:{{github_user}}/dotfiles.git"
+      shell: "yadm remote set-url origin {{yadm_repo_path}}"
       when: yadm_repo.stat.exists == false and yadm_repo.stat.isdir == false
-    - name: See if spacemacs is installed.
-      stat:
-        path: "/home/{{local_user}}/.emacs.d"
-      register: spacemacs_repo
-    - name: Remove ~/.emacs.d
-      become: false
-      file:
-        path: "/home/{{local_user}}/.emacs.d"
-        state: absent
-      when: spacemacs_repo.stat.exists == false and spacemacs_repo.stat.isdir == false
-    - name: Install Spacemacs
-      become: false
-      git:
-        repo: "https://github.com/syl20bnr/spacemacs"
-        dest: "/home/{{local_user}}/.emacs.d"
-        version: develop
+    # - name: See if spacemacs is installed.
+    #   stat:
+    #     path: "/home/{{local_user}}/.emacs.d"
+    #   register: spacemacs_repo
+    # - name: Remove ~/.emacs.d
+    #   become: false
+    #   file:
+    #     path: "/home/{{local_user}}/.emacs.d"
+    #     state: absent
+    #   when: spacemacs_repo.stat.exists == false and spacemacs_repo.stat.isdir == false
+    # - name: Install Spacemacs
+    #   become: false
+    #   git:
+    #     repo: "https://github.com/syl20bnr/spacemacs"
+    #     dest: "/home/{{local_user}}/.emacs.d"
+    #     version: develop
     - name: Install go packages
       become: false
       shell: "go get -u -v {{item}}"
